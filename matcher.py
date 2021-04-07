@@ -36,23 +36,33 @@ class TestMatcher:
         img_pts = np.array(img_pts, dtype=np.float32)
         H, _ = cv2.findHomography(img_pts, ref_pts, cv2.RANSAC, 5.0)
         h, w = self.img.shape[0], self.img.shape[1]
-        return cv2.warpPerspective(img, H, (w, h))
+        return cv2.warpPerspective(img, H, (w, h)), H
 
     def _is_visible(self, img, threshold=6):
         diff = img.mean(axis=1).std(axis=0)[1]
         return diff > threshold
 
+    def _draw_detection(self, img, H):
+        H_inv = np.linalg.inv(H)
+        h, w = self.img.shape[1], self.img.shape[0]
+        ref_pts = np.float32([[[0, 0], [0, w - 1], [h - 1, w - 1], [h - 1, 0]]])
+        tra_pts = cv2.perspectiveTransform(ref_pts, H_inv)[0]
+        for i in range(-1, 3):
+            pt1 = (tra_pts[i][0], tra_pts[i][1])
+            pt2 = (tra_pts[i + 1][0], tra_pts[i + 1][1])
+            img = cv2.line(img, pt1, pt2, (0, 255, 0), 5)
+        return img
+
     def analyze(self, img):
-        if isinstance(img, str):
-            img = cv2.imread(img)
-        aligned_img = self._align(img)
+        aligned_img, H = self._align(img)
         if aligned_img is None:
             return "no-test"
         t = aligned_img[self.t_crop]
         c = aligned_img[self.c_crop]
+        img = self._draw_detection(img, H)
         if not self._is_visible(t):
-            return "invalid"
+            return "invalid", img
         elif self._is_visible(c):
-            return "positive"
+            return "positive", img
         else:
-            return "negative"
+            return "negative", img

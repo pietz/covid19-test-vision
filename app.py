@@ -20,7 +20,10 @@ f = st.file_uploader("Select a photo")
 
 if f is not None:
     img = Image.open(f).convert("RGB")
+    print(img.size)
     img = np.array(img)[..., ::-1]
+    print(img.shape)
+    img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
     h, w = img.shape[0], img.shape[1]
     if h > w:
         size2 = int(round(h / w * size))
@@ -28,8 +31,9 @@ if f is not None:
     else:
         size2 = int(round(w / h * size))
         img = cv2.resize(img, (size2, size), interpolation=cv2.INTER_AREA)
+    print(img.shape)
 
-    res = matcher.analyze(img)
+    res, img = matcher.analyze(img)
     if res == "no-test":
         st.header("No test was found in the image")
         st.write("Try to bring the test closer to the camera.")
