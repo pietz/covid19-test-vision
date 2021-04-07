@@ -56,7 +56,7 @@ class TestMatcher:
     def analyze(self, img):
         aligned_img, H = self._align(img)
         if aligned_img is None:
-            return "no-test"
+            return "no-test", img
         t = aligned_img[self.t_crop]
         c = aligned_img[self.c_crop]
         img = self._draw_detection(img, H)
