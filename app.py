@@ -20,9 +20,9 @@ f = st.file_uploader("Select a photo")
 
 if f is not None:
     img = Image.open(f).convert("RGB")
-    print(img.size)
+    #print(img.size)
     img = np.array(img)[..., ::-1]
-    print(img.shape)
+    #print(img.shape)
     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
     h, w = img.shape[0], img.shape[1]
     if h > w:
@@ -31,7 +31,7 @@ if f is not None:
     else:
         size2 = int(round(w / h * size))
         img = cv2.resize(img, (size2, size), interpolation=cv2.INTER_AREA)
-    print(img.shape)
+    #print(img.shape)
 
     res, img = matcher.analyze(img)
     if res == "no-test":
