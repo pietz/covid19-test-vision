@@ -29,7 +29,7 @@ class TestMatcher:
         pts, descs = self._apply_sift(img)
         matches = self._match_descs(descs)
         if matches is None:
-            return None
+            return None, None
         ref_pts = [self.keys[m.queryIdx].pt for m in matches]
         ref_pts = np.array(ref_pts, dtype=np.float32)
         img_pts = [pts[m.trainIdx].pt for m in matches]
